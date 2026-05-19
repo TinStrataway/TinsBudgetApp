@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa Budget — Home Budget Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --gold-dark: #8B6914;
+    --ink: #1A1614;
+    --ink2: #2E2820;
+    --ink3: #3D3530;
+    --cream: #FAF7F2;
+    --cream2: #F3EDE3;
+    --cream3: #EAE0D0;
+    --ruby: #8B2635;
+    --ruby-light: #C4707C;
+    --ruby-pale: #F5E8EA;
+    --emerald: #1A4A3A;
+    --emerald-light: #4A8A72;
+    --emerald-pale: #E8F2EE;
+    --off: #7A6E65;
+    --border: #D4C9B8;
+    --border-strong: #B8A88A;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { font-size: 16px; }
+  body { font-family: var(--font-sans); background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+  /* ── Layout ── */
+  .app { max-width: 960px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ── Header ── */
+  .header {
+    background: var(--ink);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .logo {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; color: var(--gold);
+  }
+  .month-nav { display: flex; align-items: center; gap: 8px; }
+  .mnav-btn {
+    background: transparent;
+    border: 1px solid #4A4030;
+    border-radius: 7px;
+    padding: 6px 11px;
+    cursor: pointer;
+    color: var(--gold);
+    font-size: 15px;
+    font-family: var(--font-sans);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .mnav-btn:hover { border-color: var(--gold); background: var(--ink2); }
+  .month-lbl {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--gold-light);
+    min-width: 150px;
+    text-align: center;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Nav tabs ── */
+  .nav-tabs {
+    background: var(--ink2);
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--ink3);
+    padding: 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .ntab {
+    padding: 13px 18px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--off);
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .ntab:hover { color: var(--gold-light); }
+  .ntab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ── Body ── */
+  .body { background: var(--cream); padding: 24px 20px; flex: 1; }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+  .card-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Gold button ── */
+  .gold-btn {
+    background: var(--ink);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  .gold-btn:hover { background: var(--ink2); }
+
+  /* ── Summary cards ── */
+  .sum-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .sum-card {
+    background: var(--cream);
+    border: 1px solid var(--cream3);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .sum-card.dark { background: var(--ink); border-color: var(--gold); }
+  .sum-lbl { font-size: 10px; color: var(--off); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .sum-lbl.light { color: #8B7D6B; }
+  .sum-val { font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: var(--ink); }
+  .sum-val.gold { color: var(--gold); }
+  .sum-val.green { color: var(--emerald); }
+  .sum-val.red { color: var(--ruby); }
+  .sum-val.amber { color: #7A5C00; }
+
+  /* ── Entry rows ── */
+  .entry-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--cream3);
+    font-size: 14px;
+    flex-wrap: wrap;
+  }
+  .entry-row:last-child { border-bottom: none; }
+  .e-name { flex: 2; min-width: 100px; color: var(--ink); }
+  .e-date { font-size: 11px; color: var(--off); display: flex; align-items: center; gap: 3px; }
+  .e-amt { font-family: var(--font-serif); font-size: 16px; font-weight: 600; min-width: 95px; text-align: right; }
+  .e-amt.inc { color: var(--emerald); }
+  .e-amt.exp { color: var(--ruby); }
+  .carried { font-size: 10px; color: var(--border-strong); font-style: italic; margin-left: 4px; }
+
+  /* ── Badges ── */
+  .badge {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    font-weight: 400;
+  }
+  .b-actual   { background: #E8F2EE; color: #1A4A3A; border-color: #C0DDD0; }
+  .b-estimate { background: #FAF7EC; color: #7A5C00; border-color: #E0D090; }
+  .b-rec      { background: var(--ink); color: var(--gold); border-color: #4A3A20; }
+  .b-tin      { background: #FFF0F0; color: #8B2635; border-color: #F0C0C8; }
+  .b-cesar    { background: #EFF5FF; color: #1A3A6A; border-color: #B0C8F0; }
+  .b-kids     { background: #FFF8E8; color: #7A5200; border-color: #F0D890; }
+  .b-shared   { background: #F5EEF8; color: #5A1A8A; border-color: #D0B0E8; }
+
+  /* ── Icon buttons ── */
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--cream3);
+    cursor: pointer;
+    color: var(--border-strong);
+    padding: 5px 7px;
+    border-radius: 7px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { border-color: var(--gold); color: var(--gold); background: #FAF7F0; }
+  .icon-btn.del:hover { border-color: var(--ruby); color: var(--ruby); background: var(--ruby-pale); }
+
+  /* ── Filter tabs ── */
+  .filter-row { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .ftab {
+    padding: 5px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--off);
+    font-family: var(--font-sans);
+    letter-spacing: 0.03em;
+    transition: all 0.15s;
+  }
+  .ftab:hover { border-color: var(--gold); color: var(--gold-dark); }
+  .ftab.active { background: var(--ink); color: var(--gold); border-color: var(--gold); }
+
+  /* ── Reminder banner ── */
+  .reminder {
+    background: var(--ink);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 13px 18px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--gold-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .reminder i { color: var(--gold); font-size: 17px; flex-shrink: 0; }
+
+  /* ── Bills table ── */
+  .bills-wrap { overflow-x: auto; }
+  .bills-tbl { width: 100%; font-size: 13px; border-collapse: collapse; min-width: 520px; }
+  .bills-tbl th {
+    text-align: left;
+    font-size: 10px;
+    color: var(--border-strong);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--cream3);
+    font-weight: 500;
+  }
+  .bills-tbl td { padding: 11px 10px; border-bottom: 1px solid #F3EDE3; color: var(--ink); vertical-align: middle; }
+  .bills-tbl tr:last-child td { border-bottom: none; }
+  .due-soon { background: var(--ruby-pale); color: var(--ruby); border: 1px solid #F0C0C8; font-size: 11px; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .due-ok   { background: var(--emerald-pale); color: var(--emerald); border: 1px solid #C0DDD0; font-size: 11px; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+
+  /* ── Calendar ── */
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-top: 8px; }
+  .cal-hdr { text-align: center; font-size: 11px; color: var(--border-strong); padding: 5px 0; letter-spacing: 0.06em; text-transform: uppercase; }
+  .cal-day {
+    text-align: center;
+    padding: 7px 2px 5px;
+    font-size: 13px;
+    border-radius: 8px;
+    min-height: 40px;
+    cursor: default;
+    border: 1px solid transparent;
+    transition: background 0.1s;
+  }
+  .cal-day.other { color: var(--border); }
+  .cal-day.today { background: var(--ink); color: var(--gold); border-color: var(--gold); font-weight: 500; }
+  .cal-dot { width: 5px; height: 5px; border-radius: 50%; margin: 2px auto 0; display: block; }
+  .cal-dot.inc { background: var(--emerald); }
+  .cal-dot.exp { background: var(--ruby); }
+  .cal-legend { display: flex; gap: 16px; margin-top: 12px; }
+  .cal-legend span { font-size: 12px; color: var(--off); display: flex; align-items: center; gap: 6px; }
+  .cal-dot-lg { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+
+  /* ── Empty state ── */
+  .empty {
+    text-align: center;
+    color: var(--border-strong);
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-style: italic;
+    padding: 2rem 0;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Person breakdown ── */
+  .person-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .person-chip {
+    background: var(--cream);
+    border: 1px solid var(--cream3);
+    border-radius: 9px;
+    padding: 9px 16px;
+    text-align: center;
+    min-width: 90px;
+  }
+  .person-chip .pc-name { font-size: 10px; color: var(--off); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .person-chip .pc-amt { font-family: var(--font-serif); font-size: 16px; font-weight: 600; color: var(--ruby); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 22, 20, 0.75);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 28px;
+    width: 100%;
+    max-width: 460px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 18px;
+    letter-spacing: 0.02em;
+  }
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none; border: none; cursor: pointer;
+    color: var(--border-strong); font-size: 20px;
+    padding: 4px; border-radius: 6px;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--ruby); }
+  .flabel { display: block; font-size: 10px; color: var(--off); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; margin-top: 14px; }
+  .finput {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 14px;
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .finput:focus { border-color: var(--gold); background: #fff; }
+  .tgroup { display: flex; gap: 7px; }
+  .tbtn {
+    flex: 1;
+    padding: 9px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--off);
+    font-family: var(--font-sans);
+    transition: all 0.15s;
+  }
+  .tbtn.active { background: var(--ink); color: var(--gold); border-color: var(--gold); }
+  .modal-footer { display: flex; gap: 8px; margin-top: 22px; justify-content: flex-end; }
+  .btn-save {
+    background: var(--ink);
+    border: 1px solid var(--gold);
+    border-radius: 9px;
+    padding: 10px 24px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--gold);
+    font-family: var(--font-sans);
+    letter-spacing: 0.05em;
+    transition: background 0.15s;
+  }
+  .btn-save:hover { background: var(--ink2); }
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--off);
+    font-family: var(--font-sans);
+    transition: all 0.15s;
+  }
+  .btn-cancel:hover { border-color: var(--border-strong); color: var(--ink3); }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .body { padding: 16px 12px; }
+    .card { padding: 16px; }
+    .header { padding: 13px 14px; }
+    .month-lbl { min-width: 120px; font-size: 15px; }
+    .ntab { padding: 11px 12px; font-size: 12px; }
+    .sum-grid { grid-template-columns: 1fr 1fr; }
+    .modal { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon"><i class="ti ti-wallet" aria-hidden="true"></i></div>
+      Casa Budget
+    </div>
+    <div class="month-nav">
+      <button class="mnav-btn" onclick="changeMonth(-1)" aria-label="Previous month"><i class="ti ti-chevron-left"></i></button>
+      <span class="month-lbl" id="month-lbl"></span>
+      <button class="mnav-btn" onclick="changeMonth(1)" aria-label="Next month"><i class="ti ti-chevron-right"></i></button>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav-tabs">
+    <button class="ntab active" onclick="switchTab('overview',this)"><i class="ti ti-layout-dashboard" aria-hidden="true" style="font-size:15px"></i> Overview</button>
+    <button class="ntab" onclick="switchTab('income',this)"><i class="ti ti-trending-up" aria-hidden="true" style="font-size:15px"></i> Income</button>
+    <button class="ntab" onclick="switchTab('expenses',this)"><i class="ti ti-credit-card" aria-hidden="true" style="font-size:15px"></i> Expenses</button>
+    <button class="ntab" onclick="switchTab('bills',this)"><i class="ti ti-file-invoice" aria-hidden="true" style="font-size:15px"></i> Bills</button>
+    <button class="ntab" onclick="switchTab('calendar',this)"><i class="ti ti-calendar" aria-hidden="true" style="font-size:15px"></i> Calendar</button>
+  </div>
+
+  <!-- Tab panels -->
+  <div class="body">
+    <div id="tab-overview"></div>
+    <div id="tab-income"   style="display:none"></div>
+    <div id="tab-expenses" style="display:none"></div>
+    <div id="tab-bills"    style="display:none"></div>
+    <div id="tab-calendar" style="display:none"></div>
+  </div>
+</div>
+
+<!-- Modal mount -->
+<div id="modal-root"></div>
+
+<script>
+/* ─── Constants ─── */
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const PERSONS = ['Tin','Cesar','Kids','Shared'];
+const PERSON_CLASS = { Tin:'b-tin', Cesar:'b-cesar', Kids:'b-kids', Shared:'b-shared' };
+const BILL_CATS = ['Utilities','Internet','Rent/Mortgage','Insurance','Subscription','Loan','Other'];
+const LS_KEY = 'casabudget_v1';
+
+/* ─── State ─── */
+let S = loadState();
+let currentTab = 'overview';
+let _modalKind = 'actual';
+
+function defaultState() {
+  return { currentYear: new Date().getFullYear(), currentMonth: new Date().getMonth(), data: {}, bills: [] };
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return defaultState();
+}
+function saveState() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch(e) {}
+}
+
+/* ─── Helpers ─── */
+function mk(y, m)   { return `${y}-${String(m+1).padStart(2,'0')}`; }
+function gmd(y, m)  { const k=mk(y,m); if(!S.data[k]) S.data[k]={income:[],expenses:[]}; return S.data[k]; }
+function fmt(n)     { return '₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function esc(s)     { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function oid()      { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function ord(n)     { const v=parseInt(n)%100; return (['th','st','nd','rd'][(v-20)%10]||['th','st','nd','rd'][v]||'th'); }
+
+/* ─── Carry-over recurring ─── */
+function carryOver(y, m) {
+  const d = gmd(y, m);
+  if (d._carried) return;
+  d._carried = true;
+  const pm = m === 0 ? 11 : m-1;
+  const py = m === 0 ? y-1 : y;
+  const prev = gmd(py, pm);
+  ['income','expenses'].forEach(k => {
+    prev[k].forEach(it => {
+      if (it.recurring && it.recurring !== 'none' && !d[k].find(x => x._srcId === it.id)) {
+        d[k].push({ ...it, id: oid(), _srcId: it.id, date: '' });
+      }
+    });
+  });
+  saveState();
+}
+
+/* ─── Summaries ─── */
+function calcSums(y, m, type) {
+  const list = gmd(y, m)[type];
+  const actual   = list.filter(i => i.kind === 'actual').reduce((a,i) => a+Number(i.amount||0), 0);
+  const estimate = list.filter(i => i.kind === 'estimate').reduce((a,i) => a+Number(i.amount||0), 0);
+  return { actual, estimate, total: actual+estimate };
+}
+
+/* ─── Tab switching ─── */
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ['overview','income','expenses','bills','calendar'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === tab ? '' : 'none';
+  });
+  render();
+}
+
+function changeMonth(d) {
+  S.currentMonth += d;
+  if (S.currentMonth > 11) { S.currentMonth = 0; S.currentYear++; }
+  if (S.currentMonth < 0)  { S.currentMonth = 11; S.currentYear--; }
+  saveState();
+  render();
+}
+
+/* ─── Master render ─── */
+function render() {
+  document.getElementById('month-lbl').textContent = MONTHS[S.currentMonth] + ' ' + S.currentYear;
+  carryOver(S.currentYear, S.currentMonth);
+  if (currentTab === 'overview')  renderOverview();
+  if (currentTab === 'income')    renderIncome();
+  if (currentTab === 'expenses')  renderExpenses();
+  if (currentTab === 'bills')     renderBills();
+  if (currentTab === 'calendar')  renderCalendar();
+}
+
+/* ─── Overview ─── */
+function renderOverview() {
+  const y=S.currentYear, m=S.currentMonth;
+  const inc = calcSums(y,m,'income');
+  const exp = calcSums(y,m,'expenses');
+  const netA = inc.actual - exp.actual;
+  const netE = inc.estimate - exp.estimate;
+  const today = new Date();
+  const upcoming = (S.bills||[]).filter(b => {
+    const daysUntil = parseInt(b.dueDay) - today.getDate();
+    return today.getMonth()===m && today.getFullYear()===y && daysUntil>=0 && daysUntil<=7;
+  });
+  let h = '';
+  upcoming.forEach(b => {
+    const d = parseInt(b.dueDay)-today.getDate();
+    h += `<div class="reminder"><i class="ti ti-bell" aria-hidden="true"></i>
+      <span><strong>${esc(b.name)}</strong> is due ${d===0?'today':`in ${d} day${d>1?'s':''}`} (${b.dueDay}${ord(b.dueDay)}) — ${fmt(b.amount)}</span></div>`;
+  });
+  h += `
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Actual</span>
+    <span style="font-size:10px;color:var(--off);letter-spacing:0.06em;text-transform:uppercase">Confirmed entries</span></div>
+    <div class="sum-grid">
+      <div class="sum-card"><div class="sum-lbl">Income</div><div class="sum-val green">${fmt(inc.actual)}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Expenses</div><div class="sum-val red">${fmt(exp.actual)}</div></div>
+      <div class="sum-card dark"><div class="sum-lbl light">Net balance</div><div class="sum-val gold">${fmt(netA)}</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Estimated</span>
+    <span style="font-size:10px;color:var(--off);letter-spacing:0.06em;text-transform:uppercase">Projected entries</span></div>
+    <div class="sum-grid">
+      <div class="sum-card"><div class="sum-lbl">Income</div><div class="sum-val green">${fmt(inc.estimate)}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Expenses</div><div class="sum-val red">${fmt(exp.estimate)}</div></div>
+      <div class="sum-card dark"><div class="sum-lbl light">Net balance</div><div class="sum-val gold">${fmt(netE)}</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Bills overview</span></div>
+    <div class="sum-grid">
+      <div class="sum-card"><div class="sum-lbl">Monthly total</div><div class="sum-val red">${fmt((S.bills||[]).reduce((a,b)=>a+Number(b.amount||0),0))}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Number of bills</div><div class="sum-val">${(S.bills||[]).length}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Due within 7 days</div><div class="sum-val ${upcoming.length?'red':''}">${upcoming.length}</div></div>
+    </div>
+  </div>`;
+  document.getElementById('tab-overview').innerHTML = h;
+}
+
+/* ─── Income row ─── */
+function iRow(it) {
+  return `<div class="entry-row">
+    <span class="e-name">${esc(it.name)}${it._srcId?`<span class="carried">(carried over)</span>`:''}</span>
+    ${it.date ? `<span class="e-date"><i class="ti ti-calendar" aria-hidden="true" style="font-size:11px"></i>${esc(it.date)}</span>` : ''}
+    ${it.recurring && it.recurring!=='none' ? `<span class="badge b-rec"><i class="ti ti-refresh" aria-hidden="true" style="font-size:10px"></i> ${esc(it.recurring)}</span>` : ''}
+    <span class="badge ${it.kind==='actual'?'b-actual':'b-estimate'}">${it.kind}</span>
+    <span class="e-amt inc">${fmt(it.amount)}</span>
+    <button class="icon-btn" onclick="openModal('income','${it.id}')" aria-label="Edit income"><i class="ti ti-edit"></i></button>
+    <button class="icon-btn del" onclick="delEntry('income','${it.id}')" aria-label="Delete income"><i class="ti ti-trash"></i></button>
+  </div>`;
+}
+
+/* ─── Expense row ─── */
+function eRow(it) {
+  return `<div class="entry-row">
+    <span class="e-name">${esc(it.name)}${it._srcId?`<span class="carried">(carried over)</span>`:''}</span>
+    ${it.date ? `<span class="e-date"><i class="ti ti-calendar" aria-hidden="true" style="font-size:11px"></i>${esc(it.date)}</span>` : ''}
+    ${it.recurring && it.recurring!=='none' ? `<span class="badge b-rec"><i class="ti ti-refresh" aria-hidden="true" style="font-size:10px"></i> ${esc(it.recurring)}</span>` : ''}
+    ${it.person ? `<span class="badge ${PERSON_CLASS[it.person]||'b-shared'}">${esc(it.person)}</span>` : ''}
+    <span class="badge ${it.kind==='actual'?'b-actual':'b-estimate'}">${it.kind}</span>
+    <span class="e-amt exp">${fmt(it.amount)}</span>
+    <button class="icon-btn" onclick="openModal('expenses','${it.id}')" aria-label="Edit expense"><i class="ti ti-edit"></i></button>
+    <button class="icon-btn del" onclick="delEntry('expenses','${it.id}')" aria-label="Delete expense"><i class="ti ti-trash"></i></button>
+  </div>`;
+}
+
+/* ─── Income tab ─── */
+function renderIncome() {
+  const y=S.currentYear, m=S.currentMonth;
+  const d = gmd(y,m);
+  const s = calcSums(y,m,'income');
+  let h = `<div class="card">
+    <div class="card-hdr">
+      <span class="card-title">Income — ${MONTHS[m]}</span>
+      <button class="gold-btn" onclick="openModal('income',null)"><i class="ti ti-plus" aria-hidden="true"></i> Add income</button>
+    </div>
+    <div class="sum-grid" style="margin-bottom:14px">
+      <div class="sum-card"><div class="sum-lbl">Actual</div><div class="sum-val green">${fmt(s.actual)}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Estimated</div><div class="sum-val amber">${fmt(s.estimate)}</div></div>
+      <div class="sum-card dark"><div class="sum-lbl light">Total</div><div class="sum-val gold">${fmt(s.total)}</div></div>
+    </div>
+    <div class="filter-row">
+      <button class="ftab active" id="itab-all"      onclick="filterI('all')">All</button>
+      <button class="ftab"        id="itab-actual"   onclick="filterI('actual')">Actual</button>
+      <button class="ftab"        id="itab-estimate" onclick="filterI('estimate')">Estimate</button>
+    </div>
+    <div id="income-list">
+      ${d.income.length ? d.income.map(iRow).join('') : '<div class="empty">No income entries yet — add your first one above</div>'}
+    </div>
+  </div>`;
+  document.getElementById('tab-income').innerHTML = h;
+}
+
+function filterI(f) {
+  document.querySelectorAll('[id^="itab-"]').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('itab-'+f); if(el) el.classList.add('active');
+  const d = gmd(S.currentYear, S.currentMonth);
+  const list = f==='all' ? d.income : d.income.filter(i => i.kind===f);
+  const el2 = document.getElementById('income-list');
+  if (el2) el2.innerHTML = list.length ? list.map(iRow).join('') : `<div class="empty">No ${esc(f)} income entries</div>`;
+}
+
+/* ─── Expenses tab ─── */
+function renderExpenses() {
+  const y=S.currentYear, m=S.currentMonth;
+  const d = gmd(y,m);
+  const s = calcSums(y,m,'expenses');
+  let h = `<div class="card">
+    <div class="card-hdr">
+      <span class="card-title">Expenses — ${MONTHS[m]}</span>
+      <button class="gold-btn" onclick="openModal('expenses',null)"><i class="ti ti-plus" aria-hidden="true"></i> Add expense</button>
+    </div>
+    <div class="sum-grid" style="margin-bottom:14px">
+      <div class="sum-card"><div class="sum-lbl">Actual</div><div class="sum-val red">${fmt(s.actual)}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Estimated</div><div class="sum-val amber">${fmt(s.estimate)}</div></div>
+      <div class="sum-card dark"><div class="sum-lbl light">Total</div><div class="sum-val gold">${fmt(s.total)}</div></div>
+    </div>`;
+  const bySelf = PERSONS.map(p => ({ p, t: d.expenses.filter(e=>e.person===p).reduce((a,e)=>a+Number(e.amount||0),0) })).filter(x=>x.t>0);
+  if (bySelf.length) {
+    h += `<div class="person-grid">`;
+    bySelf.forEach(x => { h += `<div class="person-chip"><div class="pc-name">${esc(x.p)}</div><div class="pc-amt">${fmt(x.t)}</div></div>`; });
+    h += `</div>`;
+  }
+  h += `
+    <div class="filter-row">
+      <button class="ftab active" id="etab-all"      onclick="filterE('all')">All</button>
+      <button class="ftab"        id="etab-actual"   onclick="filterE('actual')">Actual</button>
+      <button class="ftab"        id="etab-estimate" onclick="filterE('estimate')">Estimate</button>
+      ${PERSONS.map(p=>`<button class="ftab" id="etab-${p}" onclick="filterE('${p}')">${esc(p)}</button>`).join('')}
+    </div>
+    <div id="expense-list">
+      ${d.expenses.length ? d.expenses.map(eRow).join('') : '<div class="empty">No expense entries yet — add your first one above</div>'}
+    </div>
+  </div>`;
+  document.getElementById('tab-expenses').innerHTML = h;
+}
+
+function filterE(f) {
+  document.querySelectorAll('[id^="etab-"]').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('etab-'+f); if(el) el.classList.add('active');
+  const d = gmd(S.currentYear, S.currentMonth);
+  const list = f==='all' ? d.expenses
+    : ['actual','estimate'].includes(f) ? d.expenses.filter(i=>i.kind===f)
+    : d.expenses.filter(i=>i.person===f);
+  const el2 = document.getElementById('expense-list');
+  if (el2) el2.innerHTML = list.length ? list.map(eRow).join('') : `<div class="empty">No entries for ${esc(f)}</div>`;
+}
+
+/* ─── Bills tab ─── */
+function renderBills() {
+  const today = new Date();
+  const bills = S.bills || [];
+  let h = `<div class="card">
+    <div class="card-hdr">
+      <span class="card-title">Bills</span>
+      <button class="gold-btn" onclick="openModal('bill',null)"><i class="ti ti-plus" aria-hidden="true"></i> Add bill</button>
+    </div>
+    <div class="sum-grid" style="margin-bottom:18px">
+      <div class="sum-card"><div class="sum-lbl">Monthly total</div><div class="sum-val red">${fmt(bills.reduce((a,b)=>a+Number(b.amount||0),0))}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Number of bills</div><div class="sum-val">${bills.length}</div></div>
+    </div>`;
+  if (!bills.length) {
+    h += `<div class="empty">No bills yet — track your recurring bills here</div>`;
+  } else {
+    h += `<div class="bills-wrap"><table class="bills-tbl">
+      <thead><tr>
+        <th style="width:28%">Bill</th>
+        <th style="width:18%">Amount</th>
+        <th style="width:13%">Due</th>
+        <th style="width:18%">Category</th>
+        <th style="width:13%">Status</th>
+        <th style="width:10%"></th>
+      </tr></thead><tbody>`;
+    bills.forEach(b => {
+      const daysUntil = parseInt(b.dueDay) - today.getDate();
+      const isSame = today.getMonth()===S.currentMonth && today.getFullYear()===S.currentYear;
+      const soon = isSame && daysUntil >= 0 && daysUntil <= 7;
+      h += `<tr>
+        <td style="font-weight:500">${esc(b.name)}</td>
+        <td style="font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--ruby)">${fmt(b.amount)}</td>
+        <td style="color:var(--off);font-size:13px">${b.dueDay}${ord(parseInt(b.dueDay))}</td>
+        <td style="font-size:12px;color:var(--off)">${esc(b.category||'')}</td>
+        <td>${soon ? `<span class="due-soon"><i class="ti ti-bell" aria-hidden="true" style="font-size:10px"></i> ${daysUntil===0?'today':daysUntil+'d'}</span>` : `<span class="due-ok"><i class="ti ti-check" aria-hidden="true" style="font-size:10px"></i> OK</span>`}</td>
+        <td><div style="display:flex;gap:4px">
+          <button class="icon-btn" onclick="openModal('bill','${b.id}')" aria-label="Edit bill"><i class="ti ti-edit" style="font-size:13px"></i></button>
+          <button class="icon-btn del" onclick="delBill('${b.id}')" aria-label="Delete bill"><i class="ti ti-trash" style="font-size:13px"></i></button>
+        </div></td>
+      </tr>`;
+    });
+    h += `</tbody></table></div>`;
+  }
+  h += `</div>`;
+  document.getElementById('tab-bills').innerHTML = h;
+}
+
+/* ─── Calendar tab ─── */
+function renderCalendar() {
+  const y=S.currentYear, m=S.currentMonth;
+  const d = gmd(y, m);
+  const today = new Date();
+  const first = new Date(y, m, 1).getDay();
+  const days  = new Date(y, m+1, 0).getDate();
+  const incMap = {}, expMap = {};
+  d.income.forEach(it   => { if(it.date){ const dd=parseInt(it.date.split('-')[2]); if(!incMap[dd]) incMap[dd]=[]; incMap[dd].push(it); }});
+  d.expenses.forEach(it => { if(it.date){ const dd=parseInt(it.date.split('-')[2]); if(!expMap[dd]) expMap[dd]=[]; expMap[dd].push(it); }});
+
+  let h = `<div class="card">
+    <div class="card-hdr"><span class="card-title">Calendar — ${MONTHS[m]} ${y}</span></div>
+    <div class="cal-grid">`;
+  DAYS.forEach(day => h += `<div class="cal-hdr">${day}</div>`);
+  for (let i=0; i<first; i++) h += `<div class="cal-day other"></div>`;
+  for (let day=1; day<=days; day++) {
+    const isToday = today.getFullYear()===y && today.getMonth()===m && today.getDate()===day;
+    h += `<div class="cal-day${isToday?' today':''}"><span>${day}</span>`;
+    if (incMap[day]) incMap[day].forEach(() => h += `<span class="cal-dot inc" title="Income"></span>`);
+    if (expMap[day]) expMap[day].forEach(() => h += `<span class="cal-dot exp" title="Expense"></span>`);
+    h += `</div>`;
+  }
+  h += `</div>
+    <div class="cal-legend">
+      <span><span class="cal-dot-lg" style="background:var(--emerald)"></span>Income</span>
+      <span><span class="cal-dot-lg" style="background:var(--ruby)"></span>Expense</span>
+    </div>
+  </div>`;
+
+  const all = [
+    ...d.income.filter(x=>x.date).map(x=>({...x,_t:'income'})),
+    ...d.expenses.filter(x=>x.date).map(x=>({...x,_t:'expense'}))
+  ].sort((a,b) => a.date.localeCompare(b.date));
+
+  h += `<div class="card">
+    <div class="card-hdr"><span class="card-title">Dated entries</span></div>`;
+  if (!all.length) {
+    h += `<div class="empty">Add dates to income or expenses to see them here</div>`;
+  } else {
+    all.forEach(it => {
+      h += `<div class="entry-row">
+        <span class="e-name">${esc(it.name)}</span>
+        <span class="e-date"><i class="ti ti-calendar" aria-hidden="true" style="font-size:11px"></i>${esc(it.date)}</span>
+        ${it.person ? `<span class="badge ${PERSON_CLASS[it.person]||'b-shared'}">${esc(it.person)}</span>` : ''}
+        <span class="badge ${it.kind==='actual'?'b-actual':'b-estimate'}">${it.kind}</span>
+        <span class="e-amt ${it._t==='income'?'inc':'exp'}">${it._t==='income'?'+':'-'}${fmt(it.amount)}</span>
+      </div>`;
+    });
+  }
+  h += `</div>`;
+  document.getElementById('tab-calendar').innerHTML = h;
+}
+
+/* ─── Modal ─── */
+function openModal(type, id) {
+  const y=S.currentYear, m=S.currentMonth;
+  const d = gmd(y, m);
+  let item = null;
+  if (id) {
+    if (type==='income')   item = d.income.find(i  => i.id===id);
+    if (type==='expenses') item = d.expenses.find(i => i.id===id);
+    if (type==='bill')     item = (S.bills||[]).find(b => b.id===id);
+  }
+  _modalKind = item ? item.kind : 'actual';
+  const titles = { income:'Income entry', expenses:'Expense entry', bill:'Bill' };
+  const verb = id ? 'Edit ' : 'New ';
+  let form = '';
+
+  if (type === 'bill') {
+    form += `
+    <label class="flabel">Bill name</label>
+    <input class="finput" id="f-name" type="text" value="${esc(item?item.name:'')}" placeholder="e.g. Meralco">
+    <label class="flabel">Amount (₱)</label>
+    <input class="finput" id="f-amount" type="number" value="${item?item.amount:''}" min="0" step="0.01" placeholder="0.00">
+    <label class="flabel">Due day of month</label>
+    <input class="finput" id="f-dueday" type="number" min="1" max="31" value="${item?item.dueDay:''}" placeholder="e.g. 15">
+    <label class="flabel">Category</label>
+    <select class="finput" id="f-category">
+      ${BILL_CATS.map(c=>`<option value="${c}"${item&&item.category===c?' selected':''}>${c}</option>`).join('')}
+    </select>`;
+  } else {
+    const cr = item ? item.recurring : 'none';
+    form += `
+    <label class="flabel">Name / description</label>
+    <input class="finput" id="f-name" type="text" value="${esc(item?item.name:'')}" placeholder="e.g. Salary">
+    <label class="flabel">Amount (₱)</label>
+    <input class="finput" id="f-amount" type="number" value="${item?item.amount:''}" min="0" step="0.01" placeholder="0.00">
+    <label class="flabel">Type</label>
+    <div class="tgroup">
+      <button type="button" class="tbtn ${_modalKind==='actual'?'active':''}"   onclick="setKind('actual',this)">Actual</button>
+      <button type="button" class="tbtn ${_modalKind==='estimate'?'active':''}" onclick="setKind('estimate',this)">Estimate</button>
+    </div>
+    <label class="flabel">Recurring</label>
+    <select class="finput" id="f-recurring">
+      <option value="none"${cr==='none'?' selected':''}>Not recurring</option>
+      <option value="weekly"${cr==='weekly'?' selected':''}>Weekly</option>
+      <option value="monthly"${cr==='monthly'?' selected':''}>Monthly</option>
+    </select>
+    <label class="flabel">Date (optional — shows on calendar)</label>
+    <input class="finput" id="f-date" type="date" value="${item&&item.date?item.date:''}">`;
+    if (type === 'expenses') {
+      const cp = item ? item.person : 'Shared';
+      form += `
+      <label class="flabel">For whom</label>
+      <select class="finput" id="f-person">
+        ${PERSONS.map(p=>`<option value="${p}"${cp===p?' selected':''}>${p}</option>`).join('')}
+      </select>`;
+    }
+    form += `
+    <label class="flabel">Notes (optional)</label>
+    <input class="finput" id="f-notes" type="text" value="${esc(item?item.notes:'')}" placeholder="Any additional notes">`;
+  }
+
+  document.getElementById('modal-root').innerHTML = `
+  <div class="modal-overlay" id="modal-overlay" onclick="closeBg(event)">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="${verb}${titles[type]}">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close modal"><i class="ti ti-x"></i></button>
+      <div class="modal-title">${verb}${titles[type]}</div>
+      ${form}
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" onclick="saveEntry('${type}','${id||''}')">Save entry</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setKind(k, btn) {
+  _modalKind = k;
+  btn.closest('.tgroup').querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function closeModal()  { document.getElementById('modal-root').innerHTML = ''; }
+function closeBg(e)    { if (e.target.id === 'modal-overlay') closeModal(); }
+
+/* ─── Save entry ─── */
+function saveEntry(type, id) {
+  const name   = (document.getElementById('f-name')||{}).value?.trim() || '';
+  const amount = parseFloat((document.getElementById('f-amount')||{}).value) || 0;
+  if (!name) { alert('Please enter a name.'); return; }
+
+  if (type === 'bill') {
+    const dueDay   = (document.getElementById('f-dueday')||{}).value   || '1';
+    const category = (document.getElementById('f-category')||{}).value || 'Other';
+    if (!S.bills) S.bills = [];
+    if (id) {
+      const b = S.bills.find(b => b.id === id);
+      if (b) { b.name=name; b.amount=amount; b.dueDay=dueDay; b.category=category; }
+    } else {
+      S.bills.push({ id: oid(), name, amount, dueDay, category });
+    }
+  } else {
+    const d         = gmd(S.currentYear, S.currentMonth);
+    const date      = (document.getElementById('f-date')     ||{}).value || '';
+    const recurring = (document.getElementById('f-recurring')||{}).value || 'none';
+    const notes     = (document.getElementById('f-notes')    ||{}).value || '';
+    const person    = type==='expenses' ? ((document.getElementById('f-person')||{}).value||'Shared') : '';
+    if (id) {
+      const it = d[type].find(i => i.id === id);
+      if (it) { it.name=name; it.amount=amount; it.kind=_modalKind; it.date=date; it.recurring=recurring; it.notes=notes; if(type==='expenses') it.person=person; }
+    } else {
+      const entry = { id: oid(), name, amount, kind: _modalKind, date, recurring, notes };
+      if (type === 'expenses') entry.person = person;
+      d[type].push(entry);
+    }
+  }
+  saveState();
+  closeModal();
+  render();
+}
+
+/* ─── Delete ─── */
+function delEntry(type, id) {
+  if (!confirm('Delete this entry?')) return;
+  const d = gmd(S.currentYear, S.currentMonth);
+  d[type] = d[type].filter(i => i.id !== id);
+  saveState();
+  render();
+}
+function delBill(id) {
+  if (!confirm('Delete this bill?')) return;
+  S.bills = (S.bills||[]).filter(b => b.id !== id);
+  saveState();
+  render();
+}
+
+/* ─── Keyboard: close modal on Escape ─── */
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+/* ─── Init ─── */
+render();
+</script>
+</body>
+</html>
